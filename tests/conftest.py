@@ -39,6 +39,16 @@ def client(session):
 
 
 @pytest.fixture
+def test_user2(client):
+    user_data = {"email": "tes1t@gmail.com", "password": "password123"}
+    res = client.post("/users/", json=user_data)
+    assert res.status_code == 201
+    new_user = res.json()
+    new_user['password'] = user_data['password']
+    return new_user
+
+
+@pytest.fixture
 def test_user(client):
     user_data = {"email": "test@gmail.com", "password": "password123"}
     res = client.post("/users/", json=user_data)
@@ -61,7 +71,7 @@ def autorized_client(client, token):
     return client
 
 @pytest.fixture
-def test_posts(test_user, session):
+def test_posts(test_user, session, test_user2):
     post_data = [{
         "title": "first title",
         "content": "first content",
@@ -74,6 +84,19 @@ def test_posts(test_user, session):
         "title": "3rd title",
         "content": "3rd content",
         "owner_id": test_user['id']
+    },  {
+        "title": "3rd title",
+        "content": "3rd content",
+        "owner_id": test_user2['id']
     }]
 
-    session.add_all()
+    def create_post_model(post):
+        return models.Post(**post)
+    
+    post_map = map(create_post_model, post_data) #converting the fixture into a list. 
+    posts = list(post_map)
+    session.add_all(posts)
+    session.commit()
+    posts = session.query(models.Post).all()
+
+    return posts
