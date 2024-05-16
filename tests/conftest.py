@@ -8,7 +8,7 @@ from app.database import get_db
 from app.database import Base
 from app.oauth2 import create_access_token
 
-SQLALCHEMY_DATABASE_URL = "postgresql://mitpatel:Password123@localhost/fastapi_test"
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:Password123@localhost/fastapi_test"
 
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
